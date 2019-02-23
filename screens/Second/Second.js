@@ -1,17 +1,12 @@
 
-// @flow
 import React, { Component } from 'react';
-import { View, Text, Image, Animated, Easing } from 'react-native';
+import { Animated, Easing } from 'react-native';
 
 import sharedStyle from './../../shared/style';
-import style from './style';
 
 const imageUri = 'https://media.scufgaming.com/pub/media/catalog/product/cache/image/1500x1200/e9c3970ab036de70892d86c6d221abfe/b/o/botg-spinner.png';
 
-type Props = {};
-type State = {};
-
-class Second extends Component<Props, State> {
+class Second extends Component {
   rotate = new Animated.Value(0);
 
   componentDidMount() {

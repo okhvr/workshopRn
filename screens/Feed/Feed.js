@@ -9,6 +9,7 @@ import { fetchMovies } from './../../api';
 
 import sharedStyle from './../../shared/style';
 import style from './style';
+import LoaderIndicator from '../../components/LoaderIndicator';
 
 type Props = {};
 type State = {};
@@ -65,6 +66,11 @@ class Feed extends Component<Props, State> {
           loading={loading}
           data={data}
         />
+        {loading && 
+          (<View style={{flexDirection: 'row', justifyContent: 'center'}}>
+            <LoaderIndicator width={30} height={30}/>
+          </View>)
+        }
       </SafeAreaView>
     );
   }
