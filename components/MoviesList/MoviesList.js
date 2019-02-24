@@ -6,19 +6,23 @@ import MovieThumb from './../MovieThumb';
 class MoviesList extends Component {
 
   renderMovieThumbNail = ({ item }, index) => (
-    <MovieThumb key={item.imdbID} {...item} />
+    <MovieThumb
+      navigateToMovie={this.props.navigateToMovie}
+      key={item.imdbID}
+      {...item}
+    />
   );
 
   keyExtractor = (item, index) => item.imdbID;
 
   onEndReached = () => {
     this.props.loadMore();
-  }
+  };
 
   onRefresh = () => {
     this.props.updateMovies();
-  }
-
+  };
+  
   render() {
     const { data } = this.props;
     return (

@@ -66,6 +66,10 @@ class Feed extends Component {
     });
   };
 
+  navigateToMovie = (movie) => {
+    this.props.navigation.navigate('Movie', {movie});
+  };
+
   render() {
     const { loading, refreshing, data } = this.state;
 
@@ -82,6 +86,7 @@ class Feed extends Component {
         <MoviesList
           loadMore={this.loadMore}
           updateMovies={this.updateMovies}
+          navigateToMovie={this.navigateToMovie}
           loading={loading}
           refreshing={refreshing}
           data={data}
