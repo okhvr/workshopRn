@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { View, Text, TouchableOpacity, SafeAreaView } from 'react-native';
+import { View, Text, TouchableOpacity, SafeAreaView, TextInput } from 'react-native';
 
 import MoviesList from './../../components/MoviesList';
 import LoaderIndicator from '../../components/LoaderIndicator';
@@ -14,6 +14,8 @@ class Feed extends Component {
     refreshing: false,
     data: null,
     page: 1,
+    search: '',
+    hasMoreResults: true,
   };
 
   componentDidMount() {
@@ -21,16 +23,22 @@ class Feed extends Component {
   }
 
   loadMovies = () => {
+    const { page, search, hasMoreResults } = this.state;
+    
+    if (!hasMoreResults) {
+      return;
+    } 
+
     this.setState({ loading: true });
     
-    fetchMovies(this.state.page)
+    fetchMovies(page, search)
       .then(res => {
-        if (this.state.data) {
-          this.state.data.push(...res)
-        } else {
-          this.setState({ data: res });
-        }
-        this.setState({ loading: false });
+        const data = page === 1 ? res : [...this.state.data, ...res];
+        this.setState({
+          loading: false,
+          data,
+          hasMoreResults: !!res.length
+        });
       })
       .catch(err => {
         console.error(err);
@@ -43,21 +51,10 @@ class Feed extends Component {
   };
 
   updateMovies = () => {
-    this.setState({refreshing: true});
-    fetchMovies(1)
-      .then(res => {
-        if (this.state.data) {
-          const newData = this.getNewMovies(res, this.state.data);
-          this.setState({ data: [...newData, ...this.state.data] });
-        } else {
-          this.setState({ data: res });
-        }
-        this.setState({refreshing: false});
-      })
-      .catch(err => {
-        console.error(err);
-        this.setState({refreshing: false});
-      });
+    this.setState({
+      page: 1,
+      hasMoreResults: true
+    }, this.loadMovies);
   };
 
   getNewMovies = (unique, old) => {
@@ -70,11 +67,24 @@ class Feed extends Component {
     this.props.navigation.navigate('Movie', {movie});
   };
 
+  handleSearch = (text) => {
+    this.setState({
+      page: 1,
+      search: text,
+      hasMoreResults: true
+    }, this.loadMovies);
+  }
+
   render() {
     const { loading, refreshing, data } = this.state;
 
     return (
       <SafeAreaView style={{ backgroundColor: 'white', borderWidth: 1, borderColor: 'red', flex: 1 }}>
+      <TextInput
+        style={{height: 40, borderColor: 'gray', borderWidth: 1}}
+        onChangeText={(e) => this.handleSearch(e)}
+        placeholder='search year'
+      />
         {!data && !loading && (
           <TouchableOpacity
             onPress={this.loadMovies}

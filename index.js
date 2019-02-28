@@ -9,7 +9,12 @@ import MovieScreen from './screens/Movie';
 import { name as appName } from './app.json';
 
 const MoviesNavigator = createStackNavigator({
-  Feeds: FeedScreen,
+  Feeds: {
+    screen: FeedScreen,
+    navigationOptions: {
+        header: null,
+    },
+  },
   Movie: MovieScreen,
 });
 
