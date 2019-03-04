@@ -1,23 +1,21 @@
-
-// @flow
 import React, { Component } from 'react';
-import { View, Text, TouchableOpacity, ActivityIndicator, SafeAreaView } from 'react-native';
+import { View, Text, TouchableOpacity, SafeAreaView, TextInput } from 'react-native';
 
 import MoviesList from './../../components/MoviesList';
+import LoaderIndicator from '../../components/LoaderIndicator';
 
 import { fetchMovies } from './../../api';
 
-import sharedStyle from './../../shared/style';
 import style from './style';
 
-type Props = {};
-type State = {};
-
-class Feed extends Component<Props, State> {
+class Feed extends Component {
   state = {
     loading: false,
+    refreshing: false,
     data: null,
     page: 1,
+    search: '',
+    hasMoreResults: true,
   };
 
   componentDidMount() {
@@ -25,17 +23,22 @@ class Feed extends Component<Props, State> {
   }
 
   loadMovies = () => {
+    const { page, search, hasMoreResults } = this.state;
+    
+    if (!hasMoreResults) {
+      return;
+    } 
+
     this.setState({ loading: true });
     
-    fetchMovies(this.state.page)
+    fetchMovies(page, search)
       .then(res => {
-        if (this.state.data) {
-          // this.setState({ data: [...this.state.data, ...res] });
-          this.state.data.push(...res)
-        } else {
-          this.setState({ data: res });
-        }
-        this.setState({ loading: false });
+        const data = page === 1 ? res : [...this.state.data, ...res];
+        this.setState({
+          loading: false,
+          data,
+          hasMoreResults: !!res.length
+        });
       })
       .catch(err => {
         console.error(err);
@@ -47,11 +50,41 @@ class Feed extends Component<Props, State> {
     this.setState((state) => ({ page: state.page + 1}), this.loadMovies);
   };
 
+  updateMovies = () => {
+    this.setState({
+      page: 1,
+      hasMoreResults: true
+    }, this.loadMovies);
+  };
+
+  getNewMovies = (unique, old) => {
+    return unique.filter(movie => {
+      return !old.find(item => movie.imdbID === item.imdbID);
+    });
+  };
+
+  navigateToMovie = (movie) => {
+    this.props.navigation.navigate('Movie', {movie});
+  };
+
+  handleSearch = (text) => {
+    this.setState({
+      page: 1,
+      search: text,
+      hasMoreResults: true
+    }, this.loadMovies);
+  }
+
   render() {
-    const { loading, data } = this.state;
+    const { loading, refreshing, data } = this.state;
 
     return (
       <SafeAreaView style={{ backgroundColor: 'white', borderWidth: 1, borderColor: 'red', flex: 1 }}>
+      <TextInput
+        style={{height: 40, borderColor: 'gray', borderWidth: 1}}
+        onChangeText={(e) => this.handleSearch(e)}
+        placeholder='search year'
+      />
         {!data && !loading && (
           <TouchableOpacity
             onPress={this.loadMovies}
@@ -62,9 +95,17 @@ class Feed extends Component<Props, State> {
         )}
         <MoviesList
           loadMore={this.loadMore}
+          updateMovies={this.updateMovies}
+          navigateToMovie={this.navigateToMovie}
           loading={loading}
+          refreshing={refreshing}
           data={data}
         />
+        {loading && 
+          (<View style={{flexDirection: 'row', justifyContent: 'center'}}>
+            <LoaderIndicator width={30} height={30}/>
+          </View>)
+        }
       </SafeAreaView>
     );
   }

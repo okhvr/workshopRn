@@ -1,20 +1,25 @@
-/**
- * @format
- * @lint-ignore-every XPLATJSCOPYRIGHT1
- */
-
- import React from 'react';
-import { AppRegistry, View, Text } from 'react-native';
-import { createBottomTabNavigator, createTabNavigator, createAppContainer } from "react-navigation";
+import { AppRegistry} from 'react-native';
+import { createBottomTabNavigator, createAppContainer, createStackNavigator } from "react-navigation";
 
 import FeedScreen from './screens/Feed';
 import SecondScreen from './screens/Second';
 import ThirdScreen from './screens/Third';
+import MovieScreen from './screens/Movie';
 
 import { name as appName } from './app.json';
 
+const MoviesNavigator = createStackNavigator({
+  Feeds: {
+    screen: FeedScreen,
+    navigationOptions: {
+        header: null,
+    },
+  },
+  Movie: MovieScreen,
+});
+
 const TabNavigator = createBottomTabNavigator({
-  Home: FeedScreen,
+  Home: MoviesNavigator,
   Second: SecondScreen,
   Third: ThirdScreen,
 }, {
@@ -28,4 +33,3 @@ const TabNavigator = createBottomTabNavigator({
 });
 
 AppRegistry.registerComponent(appName, () => createAppContainer(TabNavigator));
-// AppRegistry.registerComponent(appName, () => FeedScreen);

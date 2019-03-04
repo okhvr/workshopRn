@@ -1,31 +1,23 @@
-
-// @flow
 import React, { Component } from 'react';
-import { View, Text, Image } from 'react-native';
+import { View, Text, Image, TouchableOpacity} from 'react-native';
 
 import style from './style';
 
-type Props = {
-  Poster: string;
-  Title: string;
-  Type: string;
-  Year: string;
-  imdbID: string;
-};
-type State = {};
-
-class MovieThumb extends Component<Props, State> {
+class MovieThumb extends Component {
   render() {
-    const { Title, Poster } = this.props;
+    const { Title, Poster, Type, Year, imdbID, navigateToMovie} = this.props;
+    const movie = {Poster, Title, Type, Year, imdbID};
     return (
-      <View style={style.container}>
-        <Image
-          style={style.image}
-          source={{ uri: Poster }}
-          resizeMode="contain"
-        />
-        <Text>{Title}</Text>
-      </View>
+      <TouchableOpacity onPress={() => navigateToMovie(movie)}>
+        <View style={style.container}>
+          <Image
+            style={style.image}
+            source={{ uri: Poster }}
+            resizeMode="contain"
+          />
+          <Text>{Title}</Text>
+        </View>
+      </TouchableOpacity>
     );
   }
 }
